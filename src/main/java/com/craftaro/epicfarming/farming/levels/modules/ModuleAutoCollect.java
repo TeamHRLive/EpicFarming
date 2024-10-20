@@ -2,14 +2,14 @@ package com.craftaro.epicfarming.farming.levels.modules;
 
 import com.craftaro.core.compatibility.CompatibleMaterial;
 import com.craftaro.core.gui.GuiUtils;
-import com.craftaro.third_party.com.cryptomorin.xseries.XBlock;
-import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
-import com.craftaro.core.utils.BlockUtils;
 import com.craftaro.epicfarming.EpicFarming;
 import com.craftaro.epicfarming.boost.BoostData;
 import com.craftaro.epicfarming.farming.Farm;
 import com.craftaro.epicfarming.farming.FarmType;
+import com.craftaro.epicfarming.utils.CropUtils;
 import com.craftaro.epicfarming.utils.Methods;
+import com.craftaro.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -23,7 +23,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Wool;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,10 +65,9 @@ public class ModuleAutoCollect extends Module {
 
     private void collectCrops(Farm farm, List<Block> crops) {
         for (Block block : crops) {
-            if (BlockUtils.isCropFullyGrown(block) && isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block.getType()).get())) {
+            if (CropUtils.isFullyGrown(block) && isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block.getType()).get())) {
                 if (farm.getLevel().isAutoReplant()) {
-                    Bukkit.getScheduler().runTask(this.plugin, () ->
-                            BlockUtils.resetGrowthStage(block));
+                    Bukkit.getScheduler().runTask(this.plugin, () -> CropUtils.resetGrowthStage(block));
                     continue;
                 }
                 Bukkit.getScheduler().runTask(this.plugin, () -> block.setType(Material.AIR));
@@ -155,8 +153,8 @@ public class ModuleAutoCollect extends Module {
     public ItemStack getGUIButton(Farm farm) {
         return GuiUtils.createButtonItem(XMaterial.BUCKET, this.plugin.getLocale().getMessage("interface.button.autocollect")
                         .processPlaceholder("status", isEnabled(farm)
-                                ? this.plugin.getLocale().getMessage("general.interface.on").getMessage()
-                                : this.plugin.getLocale().getMessage("general.interface.off").getMessage()).getMessage(),
+                                ? this.plugin.getLocale().getMessage("general.interface.on").toText()
+                                : this.plugin.getLocale().getMessage("general.interface.off").toText()).getMessage(),
                 this.plugin.getLocale().getMessage("interface.button.collectiontype").processPlaceholder("status", getCollectionType(farm).translate()).getMessage(),
                 this.plugin.getLocale().getMessage("interface.button.functiontoggle").getMessage());
     }
@@ -175,8 +173,8 @@ public class ModuleAutoCollect extends Module {
         return this.plugin.getLocale()
                 .getMessage("interface.button.autocollect")
                 .processPlaceholder("status",
-                        this.plugin.getLocale().getMessage("general.interface.unlocked").getMessage())
-                .getMessage();
+                        this.plugin.getLocale().getMessage("general.interface.unlocked").toText())
+                .toText();
     }
 
     public boolean isEnabled(Farm farm) {
@@ -283,7 +281,7 @@ public class ModuleAutoCollect extends Module {
             return EpicFarming.getPlugin(EpicFarming.class)
                     .getLocale()
                     .getMessage("general.interface." + name().replace("_", "").toLowerCase())
-                    .getMessage();
+                    .toText();
         }
     }
 }
